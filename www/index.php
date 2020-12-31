@@ -75,7 +75,7 @@ if(!isset($_SESSION['email']))
     right:0px;
     margin: 5px;
 }
-        .carousel{
+        .carouselslide{
             background: antiquewhite;
             
         }
@@ -251,7 +251,7 @@ if(!isset($_SESSION['email']))
                  $lname=$row['lname'];
              
              
-            echo('<li class="nav-item"><a class="nav-link" href="#" style="color:black;"><span class="fa fa-user fa-lg"></span>'.' '.$fname.' '.$lname.'</a>');
+            echo('<li class="nav-item"><a class="nav-link" href="edit.php" style="color:black;"><span class="fa fa-user fa-lg"></span>'.' '.$fname.' '.$lname.'</a>');
                 }
                 ?></li>
                </ul>
@@ -277,9 +277,25 @@ if(!isset($_SESSION['email']))
   echo('Registration Successful.');
 echo('</div>');
       */
-        echo('<script>alert("Registration successionful");</script>');
+        echo('<script>alert("Registration successful");</script>');
         unset($_SESSION['success']);
     }
+             if(isset($_SESSION['feedsuccess']))
+               {
+                   echo('<script>alert("Feedback Received");</script>');
+                unset($_SESSION['feedsuccess']);
+               }
+            if(isset($_SESSION['editsuccess']))
+            {
+                echo '<script>alert("Record Updated");</script>';
+                unset($_SESSION['editsuccess']);
+            }
+            if(isset($_SESSION['donor_present']))
+            {
+                echo '<script>alert("Already Registered as Donor");</script>';
+                unset($_SESSION['donor_present']);
+            }
+            
     ?>
             
     <?php
@@ -405,6 +421,8 @@ echo('</div>');
                
                  echo('<tr><td><b>Blood group:</b></td><td>'.$row['bloodgrp'].'</td></tr>');
                  
+                 echo('<tr><td><b>Availability:</b></td><td>'.$row['available'].'</td></tr>');
+                 
                  echo('</table>');
                  
                             echo('</div>');
@@ -433,7 +451,14 @@ echo('</div>');
         <h1 style="text-align:left; color:#960018;">WHY SHOULD I DONATE BLOOD?</h1><br><br>
         <div class="row row-content">
         <div class="col">
-            <div id="mycarousel" class="carousel" data-ride="carouselslide">
+            <div id="mycarousel" class="carouselslide" data-ride="carousel" data-interval="2000">
+                <ol class="carousel-indicators">
+                <li data-target="#mycarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#mycarousel" data-slide-to="1" ></li>
+                <li data-target="#mycarousel" data-slide-to="2"></li>
+                    <li data-target="#mycarousel" data-slide-to="3"></li>
+                    <li data-target="#mycarousel" data-slide-to="4"></li>
+                </ol>
             <div class="carousel-inner" role="listbox">
                 <div class="carousel-item active">
                 <img class="img-fluid d-none d-md-block" src="img/avengers.jpg" alt="avengers">
@@ -718,6 +743,9 @@ echo('</div>');
     ?>
     
         <br><br>          
+    
+    
+    <center><a id="reviewButton" href="http://localhost/Blood_Donation_Project/www/feedback.php"><button class="btn text-white " style="background-color:lightcoral"><span class="fa fa-plus"></span>ADD REVIEW</button></a></center>
                 
                 
     
@@ -738,13 +766,13 @@ echo('</div>');
 
 <div class="container">
     <div class="row">
-        <div class="col-md-4 offset-1">
+        <div class="col-md-4">
             <div class="card">
-  <center><img src="img/akshatha_shetty.jpg" alt="Avatar" style="width:80%;height:300px;"></center>
+  <center><img src="img/akshatha_shetty2.jpg" alt="Avatar" style="width:80%;height:300px;"></center>
   <div class="card-content">
     <h4><b>Akshatha Shetty</b></h4>
     <p>Founder</p>
-      <p>Being a Computer Science student at NMAM Institute of technology,Akshatha developed this initiative as to help people who are in need.She believes that it is in our hands to make a difference and transform this world into a better place to live in.</p>
+      <p>A Computer Science student at NMAM Institute of technology,Akshatha developed this initiative as to help people who are in need.She believes that it is in our hands to make a difference and transform this world.</p>
       <ul class="list-unstyled mb-0">
         <!-- Facebook -->
         <a class="p-2 fa-lg fb-ic">
@@ -761,13 +789,36 @@ echo('</div>');
       </ul>
   </div>
 </div></div>
-         <div class="col-md-4 offset-2">
+         <div class="col-md-4">
             <div class="card">
-  <center><img src="img/akshatha_shetty.jpg" alt="Avatar" style="width:80%;height:300px;"></center>
+  <center><img src="img/aanch1.jpg" alt="Avatar" style="width:80%;height:300px;"></center>
   <div class="card-content">
     <h4><b>Aanchal Jain</b></h4>
     <p>Founder</p>
-      <p>Aanchal is also a Computer Science student at NMAM Institute of technology.She is a self-determined,self-motivated person whose ultimate goal in life is to transform this world into a better place and works very hard to make a difference.</p>
+      <p>Aanchal is also a Computer Science student at NMAM Institute of technology.She is a self-determined,self-motivated person whose ultimate goal in life is to transform this world into a better place.</p>
+      <ul class="list-unstyled mb-0">
+        <!-- Facebook -->
+        <a class="p-2 fa-lg fb-ic">
+          <a href="https://www.facebook.com/"><i class="fa fa-facebook-f blue-text" style="font-size:24px"> </i></a>
+        </a>
+        <!-- Twitter -->
+        <a class="p-2 fa-lg tw-ic">
+          <a href="https://twitter.com/login"><i class="fa fa-twitter blue-text" style="font-size:24px"> </i></a>
+        </a>
+        <!-- Instagram -->
+        <a class="p-2 fa-lg ins-ic">
+          <a href="https://www.instagram.com/accounts/login/"><i class="fa fa-instagram blue-text" style="font-size:24px"> </i></a>
+        </a>
+      </ul>
+  </div>
+</div></div>
+        <div class="col-md-4">
+            <div class="card">
+  <center><img src="img/bans.jpg" alt="Avatar" style="width:80%;height:300px;"></center>
+  <div class="card-content">
+    <h4><b>Bansuri Shetty</b></h4>
+    <p>Founder</p>
+      <p>Bansuri is a Computer Science student at NMAM Institute of technology.She is a hard-working,self-motivated, enthusiastic who tries her best to make an impact on the society with her amazing work.</p>
       <ul class="list-unstyled mb-0">
         <!-- Facebook -->
         <a class="p-2 fa-lg fb-ic">

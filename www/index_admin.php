@@ -273,6 +273,11 @@ echo('</div>');
         echo('<script>alert("Registration successionful");</script>');
         unset($_SESSION['success']);
     }
+            if(isset($_SESSION['feedsuccess'])
+               {
+                   echo('<script>alert("Feedback Received");</script>');
+                unset($_SESSION['feedsuccess']);
+               }
     ?>
             
     <?php

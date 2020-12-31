@@ -1,59 +1,37 @@
 <?php
 session_start();
 require_once "pdo.php";
-
+if(!isset($_SESSION['email']))
+{
+    die("Not logged in.");
+}
 // If the user requested logout go back to index.php
 if ( isset($_POST['cancel']) ) {
     header('Location:index.php');
     return;
 }
 
-if(isset($_POST['desc_name']) && isset($_POST['desc_email']) && isset($_POST['desc_phone']) && isset($_POST['desc_paragraph']))
+if(isset($_POST['desc_paragraph']))
 {
-    if(strlen($_POST['desc_name'])<1 && strlen($_POST['desc_email'])<1 && strlen($_POST['desc_phone'])<1 && strlen($_POST['desc_event']))
-    {
-        $_SESSION['error']="All values are required";
-        header('Location:feedback.php');
-          return;
-            
-    }
-     else if(strpos($_POST['desc_email'],'@')==false)
-    {
-        $_SESSION['error']="Email must have at sign (@)";
-        header('Location:feedback.php');
-        return;
-    }
     
-      else if ( strlen($_POST['desc_name']) < 1)
-{
-    $_SESSION['error']="All values are required";
-    header('Location:feedback.php');
-          return;
-}
-    else if(strlen($_POST['desc_paragraph'])<1)
+    
+     
+    if(strlen($_POST['desc_paragraph'])<1)
     {
-        $_SESSION['error']="All values are required";
+        $_SESSION['feederror']="Feedback cannot be empty";
         header('Location:feedback.php');
         return;
     }
-    else if(!is_numeric($_POST['desc_phone'])||strlen($_POST['desc_phone'])!=10)
-{
-    $_SESSION['error']="Contact no. must be numeric and valid.";
-        header('Location:feedback.php');
-        return;
-}
    
 else
 
 {
-    $sql="INSERT INTO description(desc_name,desc_email,desc_phone,desc_paragraph) VALUES(:desc_name,:desc_email,:desc_phone,:desc_paragraph)";
+    $sql="INSERT INTO review(email,desription) VALUES(:desc_email,:desc_paragraph)";
     $stmt=$pdo->prepare($sql);
     $stmt->execute(array(
-    ':desc_name'=>$_POST['desc_name'],
-    ':desc_email'=>$_POST['desc_email'],
-    ':desc_phone'=>$_POST['desc_phone'],
+    ':desc_email'=>$_SESSION['email'],
     ':desc_paragraph'=>$_POST['desc_paragraph']));
-    $_SESSION['success']=" Registration Successful";
+    $_SESSION['feedsuccess']="Feedback received";
     header('Location:index.php');
     return;
     
@@ -128,24 +106,17 @@ else
 
 <?php
 
-    if(isset($_SESSION['error']))
+    if(isset($_SESSION['feederror']))
     {
         echo('<p style="color:red;">'.htmlentities($_SESSION['error'])."</p>\n");
-        unset($_SESSION['error']);
+        unset($_SESSION['feederror']);
     }
     
     ?>
 <form method="post">
     <table>
-        <tr><th><h4><label for="desc_name">Name:</label></h4></th>
-    <th><p><input type="text" name="desc_name" id="desc_name" style="width:200px;"/></p></th></tr>
-        <tr><td><h4><label for="desc_email">Email:</label></h4></td>
-        <td><p><input type="text" name="desc_email" id="desc_email" "width:200px;"/></p></td></tr>
-
-        <tr><td><h4><label for="desc_phone">Contact No:</label></h4></td>
-   <td> <p><input type="text" name="desc_phone" id="desc_phone" "width:200px;"/></p></td></tr>
-        <tr><td><h4><label for="desc_paragraph">Review:</label></h4></td>
-            <td> <p><textarea  name="desc_paragraph" id="desc_paragraph" rows="8" cols="50"></textarea></p></td> </tr>
+        <tr><td><h4><label for="desc_paragraph">Enter Feedback:</label></h4></td>
+            <td> <p><textarea  name="desc_paragraph" id="desc_paragraph" rows="8" cols="80"></textarea></p></td> </tr>
         </table><br>
 <input type="submit" value="Submit" class="register">
 <input type="submit" name="cancel" value="Cancel" class="register"><br><br>

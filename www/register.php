@@ -1,29 +1,40 @@
 <?php
 session_start();
 require_once "pdo.php";
-
+if(!isset($_SESSION['email']))
+{
+    die("Not logged in.");
+}
 // If the user requested logout go back to index.php
 if ( isset($_POST['cancel']) ) {
     header('Location:index.php');
     return;
 }
-
- if(isset($_POST['email']) && isset($_POST['age']) && isset($_POST['gender']) && isset($_POST['bloodgrp']) && isset($_POST['city']) && isset($_POST['address']))
+if(isset($_SESSION['email']))
 {
-    if(strlen($_POST['email'])<1 && strlen($_POST['age'])<1 && strlen($_POST['gender'])<1 && strlen($_POST['bloodgrp']) && strlen($_POST['city']) && strlen($_POST['address']))
+    $stmt=$pdo->query("SELECT email FROM donor");
+             while($row=$stmt->fetch(PDO::FETCH_ASSOC))
+             {
+            if ( ($row['email']==$_SESSION['email']) ) {
+            // Redirect the browser to game.php
+            $_SESSION['donor_present']="Already Registered as Donor";
+                header('Location:index.php');
+                return;
+            }
+             }
+}
+
+ if(isset($_POST['age']) && isset($_POST['gender']) && isset($_POST['bloodgrp']) && isset($_POST['city']) && isset($_POST['address']) && isset($_POST['available']))
+    
+    {
+    if(strlen($_POST['age'])<1 && strlen($_POST['gender'])<1 && strlen($_POST['bloodgrp']) && strlen($_POST['city']) && strlen($_POST['address']) && strlen($_POST['available']))
     {
         $_SESSION['error']="All values are required";
         header('Location:register.php');
           return;
             
     }
-     else if(strpos($_POST['email'],'@')==false)
-    {
-        $_SESSION['error']="Email must have at sign (@)";
-        header('Location:register.php');
-        return;
-    }
-    
+     
       else if ( strlen($_POST['city']) < 1)
 {
     $_SESSION['error']="All values are required";
@@ -46,17 +57,21 @@ if ( isset($_POST['cancel']) ) {
 else
 
 {
-    $sql="INSERT INTO donor (email,age,gender,bloodgrp,location,address) VALUES(:email,:age,:gender,:bloodgrp,:city,:address)";
+    
+    $sql="INSERT INTO donor (email,age,gender,bloodgrp,location,address,available) VALUES(:email,:age,:gender,:bloodgrp,:city,:address,:available)";
     $stmt=$pdo->prepare($sql);
     $stmt->execute(array(
-    ':email'=>$_POST['email'],
+    ':email'=>$_SESSION['email'],
     ':age'=>$_POST['age'],
     ':gender'=>$_POST['gender'],
     ':bloodgrp'=>$_POST['bloodgrp'],
         ':city'=>$_POST['city'],
-        ':address'=>$_POST['address']
+        ':address'=>$_POST['address'],
+        ':available'=>$_POST['available'],
+        
     
     ));
+     
     $_SESSION['success']=" Registration Successful";
     echo '<script>alert("Registration Successful");</script>';
     if(isset($_SESSION['success']))
@@ -147,12 +162,7 @@ else
     
     ?>
 <form method="post">
-            <div class="form-group row">
-                <label for="email" class="col-md-2 col-form-label">Email:</label>
-                <div class="col-md-6">
-                <input type="text" class="form-control" id="email" name="email" placeholder="Email">
-                </div>
-                </div>
+            
             <div class="form-group row">
                 <label for="age" class="col-md-2 col-form-label">Age:</label>
                 <div class="col-md-6">
@@ -194,6 +204,15 @@ else
                 <label for="address" class="col-md-2 col-form-label">Address:</label>
                 <div class="col-md-6">
                 <input type="text" class="form-control" id="address" name="address" placeholder="Address">
+                </div>
+                </div>
+                <div class="form-group row">
+                <label  class="col-md-2 col-form-label">Availability:</label>
+                <div class="col-md-4">
+                <select class="form-control" name="available">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    </select>
                 </div>
                 </div>
             

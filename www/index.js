@@ -1,3 +1,9 @@
+$(document).ready(function(){
+    $("#mycarousel").carousel({interval:2000});
+});
+
+
+
 document.getElementById("DonorButton").addEventListener("click",f1);
     function f1()
     {

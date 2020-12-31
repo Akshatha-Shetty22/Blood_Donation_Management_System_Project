@@ -6,43 +6,68 @@ if( isset($_POST['cancel'] ) ) {
     header("Location: startpage.html");
     return;
 }
-if ( isset($_POST['email']) && isset($_POST['pass']) ) {
+if(isset($_SESSION['email_present']))
+{
+    echo "<script>alert('Account already present');</script>";
+    unset($_SESSION['email_present']);
+}
+if(isset($_SESSION['deletesuccess']))
+            {
+                echo '<script>alert("Record Deleted");</script>';
+                unset($_SESSION['deletesuccess']);
+            }
+if ( isset($_POST['fname']) && isset($_POST['lname']) && isset($_POST['email']) && isset($_POST['pass']) && isset($_POST['phone'])  ) {
     unset($_SESSION['who']);
-    if ( strlen($_POST['email']) < 1 || strlen($_POST['pass']) < 1 ) {
-        $_SESSION['loginerror']= "Email and password are required";
-        header('Location:login.php');
+    if ( strlen($_POST['email']) < 1 || strlen($_POST['pass']) < 1|| strlen($_POST['lname'])<1 || strlen($_POST['phone'])<1) {
+        $_SESSION['signuperror']= "All fields are required";
+        header('Location:signup.php');
         return;
     }
      else if(strpos($_POST['email'],'@')==false)
     {
-        $_SESSION['loginerror']="Email must have at sign (@)";
-        header('Location:login.php');
+        $_SESSION['signuperror']="Email must have at sign (@)";
+        header('Location:signup.php');
+        return;
+    }
+    else if(strlen($_POST['phone'])<10 || !is_numeric($_POST['phone']))
+    {
+        $_SESSION['signuperror']="Phone number must be valid and numeric";
+        header('Location:signup.php');
         return;
     }
     else
     {
-        
-            
-            $stmt=$pdo->query("SELECT email,password FROM user");
+        $stmt=$pdo->query("SELECT email FROM user");
              while($row=$stmt->fetch(PDO::FETCH_ASSOC))
              {
-                 echo("<script>alert('Hello');<script>");
-            if ( ($row['email']==$_POST['email'])&&($row['password']==$_POST['pass']) ) {
+            if ( ($row['email']==$_POST['email']) ) {
             // Redirect the browser to game.php
-            $_SESSION['email']=$_POST['email'];
-            $_SESSION['loginSuccess']="Logged In.";
-            header("Location: index.php?name=".urlencode($_POST['email']));
-            error_log("Login success ".$_POST['email']);
-            
-            return;
-        } 
+            $_SESSION['email_present']="ALready a user";
+                
+                header('Location:signup.php');
+                return;
+            }
              }
-            $_SESSION['loginerror']="Incorrect password";
-            error_log("Login fail ".$_POST['email']." $check");
-            header('Location:login.php');
-            
-            return;
         
+            
+            $sql="INSERT INTO user (email,password,fname,lname,phone) VALUES(:email,:pass,:fname,:lname,:phone)";
+    $stmt=$pdo->prepare($sql);
+    $stmt->execute(array(
+    ':email'=>$_POST['email'],
+    ':pass'=>$_POST['pass'],
+    ':fname'=>$_POST['fname'],
+    ':lname'=>$_POST['lname'],
+        ':phone'=>$_POST['phone']
+    
+    ));
+    $_SESSION['signupsuccess']="You have successfully Signed in";
+        $_SESSION['email']=$_POST['email'];
+    echo '<script>alert("You have successfully Signed in");</script>';
+    if(isset($_SESSION['signupsuccess']))
+    {
+        header('Location:index.php?name='.htmlentities($_SESSION['email']));
+        return;
+    }
     
     }
 }
@@ -144,48 +169,48 @@ if ( isset($_POST['email']) && isset($_POST['pass']) ) {
 			.cancelbtn {
 				width: 100%;
 			}
-            .bgimg{
-                background-image:url(img/login_back.png);
-	background-size: 100% 100%;
-	background-attachment: fixed;
-	width:auto;
-	height:750px;
-            }
 		}
 	
 	</style>
 
 </head>
-<body class="bgimg">
-    
+<body>
 	
 	<form method="post">
 	  <div class="imgcontainer">
-		<img src="img/login_image3.jpg" alt="Avatar" class="avatar">
+		<img src="img/signin_image.png" alt="Avatar" class="avatar">
 	  </div>
 <?php
 // Note triple not equals and think how badly double
 // not equals would work here...
-if (isset($_SESSION['error'])) {
+if (isset($_SESSION['signuperror'])) {
     // Look closely at the use of single and double quotes
-    echo('<p style="color: red;">'.htmlentities($_SESSION['loginerror'])."</p>\n");
-    unset($_SESSION['loginerror']);
+    echo('<p style="color: red;">'.htmlentities($_SESSION['signuperror'])."</p>\n");
+    unset($_SESSION['signuperror']);
 }
-    if(isset($_SESSION['loginSuccess']))
+    if(isset($_SESSION['signupsuccess']))
     {
         
-    unset($_SESSION['loginSuccess']);
+    unset($_SESSION['signupsuccess']);
     }
 
 ?>
+        <label for="fname">First Name</label>
+		<input type="text"  name="fname">
+
+		<label for="lname">Last Name</label>
+		<input type="text"  name="lname">
 	  
-		<label for="uname">Enter your Email</label>
+		<label for="uname">Email</label>
 		<input type="text"  name="email">
 
-		<label for="psw">Enter your Password</label>
+		<label for="psw">Password</label>
 		<input type="password"  name="pass">
+        
+        <label for="phone">Phone</label>
+		<input type="text"  name="phone">
 
-		<button type="submit">Login</button>
+		<button type="submit">SIGNUP</button>
 		
 	 
 
@@ -194,7 +219,6 @@ if (isset($_SESSION['error'])) {
 		
 	  </div>
 	</form>
-       
 	
 </body>
 </html>
